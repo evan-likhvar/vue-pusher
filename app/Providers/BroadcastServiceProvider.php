@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Broadcast;
-
+use App\Conversation;
 class BroadcastServiceProvider extends ServiceProvider
 {
     /**
@@ -16,6 +16,15 @@ class BroadcastServiceProvider extends ServiceProvider
     {
         Broadcast::routes();
 
-        require base_path('routes/channels.php');
+        //require base_path('routes/channels.php');
+
+        Broadcast::channel('user.*', function ($user, $userId) {
+            return (int) $user->id === (int) $userId;
+        });
+
+        Broadcast::channel('conversation.*', function ($user, $conversationId) {
+            return $user->isInConversation(Conversation::find($conversationId));
+        });
+
     }
 }

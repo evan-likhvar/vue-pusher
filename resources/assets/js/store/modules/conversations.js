@@ -22,6 +22,17 @@ const actions = {
         api.getConversations(1).then((response)=>{
             commit('setConversations',response.data.data);
             commit('setConversationsLoading', false)
+
+            Echo.private('user.' + Laravel.user.id)
+                .listen('ConversationCreated', (e) => {
+                    commit('prependToConversations', e.data)
+                })
+                .listen('ConversationReplyCreated', (e) => {
+                    commit('prependToConversations', e.data.parent.data)
+                })
+                .listen('ConversationUsersCreated', (e) => {
+                    commit('updateConversationInList', e.data)
+                })
         })
     }
 };
