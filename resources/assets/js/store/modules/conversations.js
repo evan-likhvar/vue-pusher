@@ -3,15 +3,15 @@ import conversation from "./conversation";
 
 const state = {
     conversations: [],
-    loadingConversation: false
+    loadingConversations: false
 };
 
 const getters = {
     allConversations: state => {
         return state.conversations
     },
-    loadingConversation: state => {
-        return state.loadingConversation
+    loadingConversations: state => {
+        return state.loadingConversations
     }
 };
 
@@ -34,6 +34,22 @@ const mutations = {
     setConversationsLoading (state, status) {
         state.loadingConversations = status
     },
+    prependToConversations (state, conversation) {
+        state.conversations = state.conversations.filter((c) => {
+            return c.id !== conversation.id
+        });
+
+        state.conversations.unshift(conversation)
+    },
+    updateConversationInList (state, conversation) {
+        state.conversations = state.conversations.map((c) => {
+            if (c.id == conversation.id) {
+                return conversation
+            }
+
+            return c
+        })
+    }
 };
 
 const  modules = {

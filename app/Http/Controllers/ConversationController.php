@@ -13,7 +13,7 @@ class ConversationController extends Controller
 
     public function show(Conversation $conversation)
     {
-        //$this->authorize('show', $conversation);
+        $this->authorize('show', $conversation);
 
         return view('conversations.index', compact('conversation'));
     }

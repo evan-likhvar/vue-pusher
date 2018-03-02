@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Conversation;
+use App\Http\Requests\StoreConversationRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Transformers\ConversationTransformer;
@@ -41,5 +42,27 @@ class ConversationController extends Controller
             ->toArray();
     }
 
+    public function store(StoreConversationRequest $request)
+    {
+        $conversation = new Conversation;
+        $conversation->body = $request->body;
+        $conversation->user()->associate($request->user());
+        $conversation->save();
 
+        $conversation->touchLastReply();
+
+        $conversation->users()->sync(array_unique(
+            array_merge($request->recipients, [$request->user()->id])
+        ));
+
+        $conversation->load('users');
+
+        //broadcast(new ConversationCreated($conversation))->toOthers();
+
+        return fractal()
+            ->item($conversation)
+            ->parseIncludes(['user', 'users', 'replies', 'replies.user'])
+            ->transformWith(new ConversationTransformer)
+            ->toArray();
+    }
 }
